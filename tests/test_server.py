@@ -29,12 +29,17 @@ STATUS_TAGS = [
 class FakeRenderer:
     def __init__(self, fail: bool = False) -> None:
         self.calls: list[tuple[str, tuple[int, int]]] = []
+        self.html_calls: list[tuple[str, tuple[int, int]]] = []
         self.fail = fail
 
     async def fetch(self, url: str, size: tuple[int, int]) -> Image.Image:
         self.calls.append((url, size))
         if self.fail:
             raise ConnectionError("page unreachable")
+        return Image.new("RGB", size, "white")
+
+    async def fetch_html(self, html: str, size: tuple[int, int]) -> Image.Image:
+        self.html_calls.append((html, size))
         return Image.new("RGB", size, "white")
 
 
@@ -113,6 +118,23 @@ async def test_connected_display_receives_its_configured_url() -> None:
         writer.close()
     finally:
         await app.server.close(abort=True)
+
+
+async def test_device_page_shows_the_display_its_own_data() -> None:
+    renderer = FakeRenderer()
+
+    types = await connect_and_collect(
+        DeviceConfig(url="about:device", name="Kitchen"), renderer
+    )
+
+    assert PacketType.IMAGE in types
+    assert renderer.calls == []
+    [(html, size)] = renderer.html_calls
+    assert size == (1024, 758)
+    assert "Kitchen" in html
+    assert UUID_STR in html
+    assert "100%" in html  # BatteryLevel from the status frame
+    assert "7.4.4407" in html
 
 
 async def test_connected_display_is_asked_for_its_touch_mode() -> None:

@@ -23,7 +23,8 @@ from pyvisionect.session import (
     TouchReceived,
 )
 
-from .config import Config, DeviceConfig
+from .config import DEVICE_PAGE_URL, Config, DeviceConfig
+from .device_page import render_device_page
 from .display import encode, preview_png, resolve_panel, viewport
 from .render import Renderer
 from .status import DeviceStatus, render_page
@@ -130,7 +131,17 @@ class InkcastServer:
     ) -> None:
         device_id = conn.state.device_id
         panel = resolve_panel(conn.state)
-        image = await self.renderer.fetch(device.url, viewport(panel, device.rotate))
+        size = viewport(panel, device.rotate)
+        if device.url == DEVICE_PAGE_URL:
+            html = render_device_page({
+                **self._status(uuid).to_json(device, connected=True),
+                "refresh_seconds": self.config.refresh_seconds_for(uuid),
+                "touch": device.touch,
+                "resolution": size,
+            })
+            image = await self.renderer.fetch_html(html, size)
+        else:
+            image = await self.renderer.fetch(device.url, size)
 
         digest = hashlib.sha256(image.tobytes()).hexdigest()
         if not force and self._last_digest.get(device_id) == digest:

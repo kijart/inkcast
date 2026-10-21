@@ -20,6 +20,13 @@ def test_defaults_when_file_only_sets_default_url(tmp_path: Path) -> None:
     assert config.refresh_seconds == 300
 
 
+def test_default_url_is_the_device_page_when_not_set(tmp_path: Path) -> None:
+    config = load_config(write(tmp_path, "port = 11113\n"))
+
+    assert config.default_url == "about:device"
+    assert config.device("abcdef00-1111-2222-3333-444455556666").url == "about:device"
+
+
 def test_device_overrides_are_parsed_and_uuid_normalised(tmp_path: Path) -> None:
     config = load_config(
         write(

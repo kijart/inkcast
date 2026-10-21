@@ -46,7 +46,7 @@ size from what the display reports. Reports for other models are welcome.
 
 ```sh
 git clone <this repository> inkcast && cd inkcast
-cp config.example.toml config.toml # set default_url
+cp config.example.toml config.toml # optionally set default_url
 uv sync
 uv run playwright install chromium
 uv run inkcast config.toml # add -v for debug logs
@@ -62,7 +62,7 @@ docker compose up -d --build # or: podman compose up -d --build
 When a display connects, its UUID appears in the log:
 
 ```txt
-2026-10-18T22:30:00.123Z INFO inkcast.server: 00112233-4455-6677-8899-aabbccddeeff connected (...)
+2026-10-18T22:30:00.123Z INFO inkcast.server: 00112233-4455-6677-8899-gghhiijjkkll connected (...)
 ```
 
 Use it in `config.toml` to give that display its own settings.
@@ -92,7 +92,7 @@ default_url = "http://example.com" # for displays not listed below
 refresh_seconds = 300
 status_port = 8000
 
-[devices."00112233-4455-6677-8899-aabbccddeeff"]
+[devices."00112233-4455-6677-8899-gghhiijjkkll"]
 name = "Kitchen"
 url = "http://example.com/kitchen"
 refresh_seconds = 3600
@@ -100,21 +100,25 @@ rotate = 180
 sleep_minutes = 60
 ```
 
-| Option            | Default     | Description                                                                                                       |
-| ----------------- | ----------- | ----------------------------------------------------------------------------------------------------------------- |
-| `default_url`     | (required)  | What displays without their own `url` show.                                                                       |
-| `host`            | `"0.0.0.0"` | Address to listen on.                                                                                             |
-| `port`            | `11113`     | Port displays connect to (the Visionect default).                                                                 |
-| `refresh_seconds` | `300`       | How often connected displays are re-rendered. The image is only sent if it changed. Each display can override it. |
-| `settle_seconds`  | `2.0`       | Wait after a page loads, so client-side widgets can draw.                                                         |
-| `status_port`     | off         | Port of the status page and JSON API.                                                                             |
+| Option            | Default          | Description                                                                                                       |
+| ----------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `default_url`     | `"about:device"` | What displays without their own `url` show. `about:device` is a built-in page with the display's own data.        |
+| `host`            | `"0.0.0.0"`      | Address to listen on.                                                                                             |
+| `port`            | `11113`          | Port displays connect to (the Visionect default).                                                                 |
+| `refresh_seconds` | `300`            | How often connected displays are re-rendered. The image is only sent if it changed. Each display can override it. |
+| `settle_seconds`  | `2.0`            | Wait after a page loads, so client-side widgets can draw.                                                         |
+| `status_port`     | off              | Port of the status page and JSON API.                                                                             |
+
+`about:device` shows the display's name, UUID, battery, charging state, signal quality, temperature, humidity,
+firmware, wake interval, refresh interval, touch mode, resolution and rotation. It has no clock and rounds the
+values, so the display is only redrawn when something actually changes.
 
 Per display, under `[devices."<uuid>"]`:
 
 | Option            | Default                  | Description                                                                                                          |
 | ----------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `name`            | `""`                     | Shown on the status page and in the API.                                                                             |
-| `url`             | `default_url`            | Web page, image URL, or `file:///path/to/image.png`.                                                                 |
+| `url`             | `default_url`            | Web page, image URL, `file:///path/to/image.png`, or `about:device`.                                                 |
 | `fit`             | `"contain"`              | Images only: `contain` (white bands), `cover` (crop) or `stretch`.                                                   |
 | `refresh_seconds` | global `refresh_seconds` | How often this display is re-rendered while connected. With `sleep_minutes`, it is updated when it wakes up instead. |
 | `rotate`          | `0`                      | `0`, `90`, `180` or `270`. `90`/`270` render the page in portrait.                                                   |
@@ -171,7 +175,7 @@ then any other display that has connected):
 ```json
 [
   {
-    "uuid": "00112233-4455-6677-8899-aabbccddeeff",
+    "uuid": "00112233-4455-6677-8899-gghhiijjkkll",
     "name": "Kitchen",
     "state": "asleep",
     "connected": false,
@@ -194,7 +198,7 @@ then any other display that has connected):
       "result": "sent",
       "error": null
     },
-    "preview_url": "/devices/00112233-4455-6677-8899-aabbccddeeff/preview.png"
+    "preview_url": "/devices/00112233-4455-6677-8899-gghhiijjkkll/preview.png"
   }
 ]
 ```
@@ -226,7 +230,7 @@ rest:
       - name: "Kitchen display state"
         unique_id: kitchen_display_state
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.state }}
       - name: "Kitchen display battery"
         unique_id: kitchen_display_battery
@@ -234,7 +238,7 @@ rest:
         state_class: measurement
         unit_of_measurement: "%"
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.battery_percent }}
       - name: "Kitchen display signal"
         unique_id: kitchen_display_signal
@@ -242,7 +246,7 @@ rest:
         state_class: measurement
         unit_of_measurement: "dBm"
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.signal_dbm }}
       - name: "Kitchen display temperature"
         unique_id: kitchen_display_temperature
@@ -250,7 +254,7 @@ rest:
         state_class: measurement
         unit_of_measurement: "°C"
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.temperature_c }}
       - name: "Kitchen display humidity"
         unique_id: kitchen_display_humidity
@@ -258,31 +262,31 @@ rest:
         state_class: measurement
         unit_of_measurement: "%"
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.humidity_percent }}
       - name: "Kitchen display last seen"
         unique_id: kitchen_display_last_seen
         device_class: timestamp
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ as_datetime(d.last_seen) if d.last_seen else none }}
       - name: "Kitchen display next wake"
         unique_id: kitchen_display_next_wake
         device_class: timestamp
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ as_datetime(d.next_wake) if d.next_wake else none }}
       - name: "Kitchen display last update"
         unique_id: kitchen_display_last_update
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.last_update.result or 'unknown' }}
     binary_sensor:
       - name: "Kitchen display connected"
         unique_id: kitchen_display_connected
         device_class: connectivity
         value_template: >-
-          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-aabbccddeeff') | first %}
+          {% set d = value_json | selectattr('uuid', 'equalto', '00112233-4455-6677-8899-gghhiijjkkll') | first %}
           {{ d.connected }}
 ```
 
@@ -297,7 +301,7 @@ with this _Still image URL_ (leave the stream URL empty) and show it with a
 _Picture Entity_ card:
 
 ```txt
-http://<inkcast-host>:8000/devices/00112233-4455-6677-8899-aabbccddeeff/preview.png
+http://<inkcast-host>:8000/devices/00112233-4455-6677-8899-gghhiijjkkll/preview.png
 ```
 
 **Alerts**, for example:

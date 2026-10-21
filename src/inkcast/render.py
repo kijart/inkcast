@@ -51,6 +51,17 @@ class Renderer:
         finally:
             await page.close()
 
+    async def fetch_html(self, html: str, size: tuple[int, int]) -> Image.Image:
+        """A *size* screenshot of a self-contained *html* document."""
+        assert self._browser is not None, "use Renderer as an async context manager"
+        width, height = size
+        page = await self._browser.new_page(viewport={"width": width, "height": height})
+        try:
+            await page.set_content(html)
+            return _open(await page.screenshot())
+        finally:
+            await page.close()
+
 
 def _is_raster(content_type: str | None) -> bool:
     """Images Pillow can decode; SVG is left to the browser."""

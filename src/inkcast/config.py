@@ -6,6 +6,8 @@ from pathlib import Path
 
 ROTATIONS = (0, 90, 180, 270)
 FITS = ("contain", "cover", "stretch")
+DEVICE_PAGE_URL = "about:device"
+"""Built-in page showing the display's own data (battery, signal, ...)."""
 
 
 @dataclass(frozen=True)
@@ -27,7 +29,7 @@ class DeviceConfig:
 
 @dataclass(frozen=True)
 class Config:
-    default_url: str
+    default_url: str = DEVICE_PAGE_URL
     host: str = "0.0.0.0"
     port: int = 11113
     refresh_seconds: int = 300
@@ -47,7 +49,7 @@ class Config:
 
 def load_config(path: Path) -> Config:
     raw = tomllib.loads(path.read_text())
-    default_url = raw.pop("default_url")
+    default_url = raw.pop("default_url", DEVICE_PAGE_URL)
     devices = {
         uuid.lower(): DeviceConfig(**{"url": default_url, **settings})
         for uuid, settings in raw.pop("devices", {}).items()

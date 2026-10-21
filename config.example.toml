@@ -1,6 +1,8 @@
 # URL shown on any display not listed under [devices]. A web page is rendered with
 # headless Chromium; an image (PNG, JPEG, ...) or file:///path/to/image.png is used as-is.
-default_url = "http://example.com"
+# "about:device" (the default) is a built-in page with the display's own data:
+# battery, signal, temperature, humidity, firmware, ...
+default_url = "about:device"
 
 # Where displays connect (same port the Visionect server used).
 host = "0.0.0.0"
@@ -17,11 +19,19 @@ settle_seconds = 2.0
 status_port = 8000
 
 # Per-display overrides, keyed by the UUID printed in the log when it connects.
-# [devices."00112233-4455-6677-8899-aabbccddeeff"]
-# name = "Kitchen"                   # shown on the status page
-# url = "http://example.com/kitchen" # overrides default_url
-# fit = "contain"                    # images only: contain (white bands), cover (crop) or stretch
-# refresh_seconds = 60               # overrides the global refresh_seconds while connected
-# rotate = 180                       # 0, 90, 180 or 270 (90/270 = portrait)
-# sleep_minutes = 60                 # >0 tells a battery display to sleep after each update
-# touch = false                      # turn the touch panel on (saved on the display; uses more battery)
+[devices."00112233-4455-6677-8899-aabbccddeeff"]
+name = "Server"       # shown on the status page
+# url = "about:device"  # overrides default_url; "about:device" for its own data
+fit = "contain"       # images only: contain (white bands), cover (crop) or stretch
+refresh_seconds = 600 # overrides the global refresh_seconds while connected
+rotate = 180          # 0, 90, 180 or 270 (90/270 = portrait)
+sleep_minutes = 10    # >0 tells a battery display to sleep after each update
+touch = false         # turn the touch panel on (saved on the display; uses more battery)
+[devices."00112233-4455-6677-8899-gghhiijjkkll"]
+name = "Kitchen"
+url = "http://example.com/kitchen"
+fit = "contain"
+refresh_seconds = 60
+rotate = 180
+sleep_minutes = 60
+touch = false
