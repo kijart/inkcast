@@ -117,7 +117,7 @@ async def test_page_is_self_contained_and_themeable() -> None:
     assert UUID_STR in html
     assert "prefers-color-scheme: dark" in html
     assert 'data-theme="dark"' in html or "data-theme" in html
-    for external in ("<script src", "@import", "https://"):
+    for external in ("<script src", "@import", 'src="http', "url(http"):
         assert external not in html
     assert all('href="data:' in tag for tag in re.findall(r"<link[^>]*>", html))
 
@@ -179,3 +179,9 @@ def test_page_declares_an_inline_favicon() -> None:
     page = render_page([])
     assert '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,' in page
     assert '<h1><img src="data:image/svg+xml,' in page
+
+
+def test_footer_links_to_the_repository() -> None:
+    page = render_page([])
+    footer = page[page.index("<footer>") : page.index("</footer>")]
+    assert '<a class="muted" href="https://github.com/kijart/inkcast" target="_blank" rel="noopener">GitHub</a>' in footer

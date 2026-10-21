@@ -192,6 +192,7 @@ def render_page(devices: list[dict[str, Any]]) -> str:
 </div>
 <footer>
   <span>Refreshes every 30 s</span> · <a class="muted" href="/api/devices">JSON</a> ·
+  <a class="muted" href="https://github.com/kijart/inkcast" target="_blank" rel="noopener">GitHub</a> ·
   <div class="theme" role="group" aria-label="Theme">
     <button type="button" data-value="auto">Auto</button>
     <button type="button" data-value="light">Light</button>
