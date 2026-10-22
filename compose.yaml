@@ -1,8 +1,7 @@
 services:
   inkcast:
-    build:
-      context: .
-      dockerfile: Containerfile
+    image: ghcr.io/kijart/inkcast:latest # or Docker Hub: kijart/inkcast:latest
+    build: .
     container_name: inkcast
     restart: unless-stopped
     ports:

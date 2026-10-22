@@ -52,12 +52,15 @@ uv run playwright install chromium
 uv run inkcast config.toml # add -v for debug logs
 ```
 
-Or in a container:
+Or in a container, with the published image (`ghcr.io/kijart/inkcast` or `kijart/inkcast` on Docker Hub):
 
 ```sh
 cp config.example.toml config.toml
-docker compose up -d --build # or: podman compose up -d --build
+docker compose up -d # or: podman compose up -d
 ```
+
+`latest` is the last commit on `master`; `x.y.z` is a release. To build the image
+locally instead, add `--build`.
 
 When a display connects, its UUID appears in the log:
 
@@ -353,6 +356,22 @@ uv sync
 uv run playwright install chromium # the renderer tests use a real browser
 uv run pytest
 ```
+
+### Releasing
+
+Every push to `master` publishes the image as `latest`, and every `x.y.z` git tag (no
+`v` prefix) as `x.y.z`, to Docker Hub and the GitHub Container Registry
+([`publish-image.yml`](.github/workflows/publish-image.yml)). The tag must match the
+`version` in `pyproject.toml`:
+
+```sh
+# bump version in pyproject.toml, commit, then:
+git tag 1.2.3 && git push origin 1.2.3
+```
+
+The workflow needs two repository secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`
+(a Docker Hub access token with read/write scope). The first push to ghcr.io creates
+a private package; make it public under the package settings.
 
 ## Credits
 
