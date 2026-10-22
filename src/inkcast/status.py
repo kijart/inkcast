@@ -48,7 +48,6 @@ class DeviceStatus:
             "next_wake": _iso(next_wake),
             "battery_percent": f.get("BatteryLevel"),
             "battery_voltage_mv": f.get("BatteryVoltage"),
-            "charging": (f.get("ChargingStatus") or {}).get("name"),
             "signal_dbm": f.get("SignalStrength"),
             "temperature_c": f.get("AverageTemperature"),
             "humidity_percent": f.get("HumiditySensor"),
@@ -263,9 +262,7 @@ def _battery(d: dict[str, Any]) -> str:
     css = "ok" if percent > 40 else "warn" if percent > 15 else "bad"
     volts = f' <span class="muted">{d["battery_voltage_mv"] / 1000:.2f} V</span>' \
         if d["battery_voltage_mv"] else ""
-    charging = f' <span class="muted">({escape(d["charging"])})</span>' \
-        if d["charging"] and d["charging"] != "disabled" else ""
-    return f'<span class="{css}">{percent} %</span>{volts}{charging}'
+    return f'<span class="{css}">{percent} %</span>{volts}'
 
 
 def _unit(value: Any, unit: str) -> str:

@@ -4,7 +4,6 @@ INFO = {
     "uuid": "00112233-4455-6677-8899-aabb00000000",
     "name": "Kitchen",
     "battery_percent": 87,
-    "charging": "charging",
     "signal_dbm": -63,
     "temperature_c": 21.6,
     "humidity_percent": 44.4,
@@ -21,10 +20,11 @@ def test_page_shows_the_display_data() -> None:
     html = render_device_page(INFO)
 
     for text in (
-        "Kitchen", INFO["uuid"], "87%", "charging", "Good", "22 °C", "44%",
+        "Kitchen", INFO["uuid"], "87%", "Good", "22 °C", "44%",
         "7.4.4407", "every 60 min", "every 5 min", "On", "758 × 1024", "90°",
     ):
         assert text in html
+    assert "Charging" not in html  # the display shows nothing while it charges
 
 
 def test_page_escapes_the_name() -> None:
@@ -36,11 +36,11 @@ def test_page_escapes_the_name() -> None:
 
 def test_unknown_values_show_a_dash() -> None:
     html = render_device_page(
-        {**INFO, "battery_percent": None, "charging": None, "signal_dbm": None,
+        {**INFO, "battery_percent": None, "signal_dbm": None,
          "temperature_c": None, "humidity_percent": None, "firmware": None}
     )
 
-    assert html.count("<dd>—</dd>") == 6
+    assert html.count("<dd>—</dd>") == 5
 
 
 def test_display_without_sleep_is_always_awake() -> None:

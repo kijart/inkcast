@@ -109,7 +109,7 @@ sleep_minutes = 60
 | `settle_seconds`  | `2.0`            | Wait after a page loads, so client-side widgets can draw.                                                         |
 | `status_port`     | off              | Port of the status page and JSON API.                                                                             |
 
-`about:device` shows the display's name, UUID, battery, charging state, signal quality, temperature, humidity,
+`about:device` shows the display's name, UUID, battery, signal quality, temperature, humidity,
 firmware, wake interval, refresh interval, touch mode, resolution and rotation. It has no clock and rounds the
 values, so the display is only redrawn when something actually changes.
 
@@ -183,7 +183,6 @@ then any other display that has connected):
     "next_wake": "2026-10-18T23:30:00Z",
     "battery_percent": 97,
     "battery_voltage_mv": 4138,
-    "charging": "disabled",
     "signal_dbm": -66,
     "temperature_c": 26,
     "humidity_percent": 54,

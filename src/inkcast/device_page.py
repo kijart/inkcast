@@ -31,7 +31,6 @@ def render_device_page(info: dict[str, Any]) -> str:
     width, height = info["resolution"]
     rows = [
         ("Battery", _unit(info["battery_percent"], "%")),
-        ("Charging", info["charging"]),
         ("Signal", _signal(info["signal_dbm"])),
         ("Temperature", _unit(info["temperature_c"], " °C")),
         ("Humidity", _unit(info["humidity_percent"], "%")),

@@ -89,7 +89,7 @@ class InkcastServer:
                     pending.on_acked(event.packet_id)
                 case Nacked():
                     log.warning("%s refused packet %d", event.uuid, event.packet_id)
-                    pending.on_nacked(event.packet_id, charging=event.charging)
+                    pending.on_nacked(event.packet_id)
 
     def _sync_touch_mode(self, conn: DeviceConnection, uuid: str, current: int) -> None:
         """Write the configured touch mode, and persist it, only if the device differs."""

@@ -56,6 +56,7 @@ async def test_api_reports_a_connected_display() -> None:
     assert device["state"] == "connected"
     assert device["last_seen"].endswith("Z")  # UTC
     assert device["battery_percent"] == 100
+    assert "charging" not in device  # the display shows nothing while it charges
     assert device["firmware"] == "7.4.4407"
     assert device["source"] == "http://mine/"
     assert device["sleep_minutes"] == 60
